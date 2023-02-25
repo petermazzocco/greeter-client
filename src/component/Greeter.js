@@ -3,13 +3,15 @@ import { useState, useEffect } from "react";
 import { abi } from "../utils/greeterABI";
 import globe from "../img/globe.gif";
 import MetaMaskAuth from "./MetaMaskAuth";
+import Filter from "bad-words";
 
 const greeterContractABI = abi;
 const greeterAddress = "0xfa81A6e1f8651E7564273BB3a97C2B3d4E40d075";
 const Greeter = () => {
+  const filter = new Filter();
   const [currentGreeting, setCurrentGreeting] = useState("");
   const [newGreeting, setNewGreeting] = useState("");
-  // const [txHash, setTxHash] = useState("");
+  const [txHash, setTxHash] = useState("");
 
   //Get current greeting
   useEffect(() => {
@@ -29,7 +31,7 @@ const Greeter = () => {
   }, []);
 
   const handleNewGreetingChange = (e) => {
-    setNewGreeting(e.target.value);
+    setNewGreeting(filter.clean(e.target.value));
   };
 
   //New greeter message
@@ -42,9 +44,9 @@ const Greeter = () => {
       signer
     );
 
-    // const setGreetingTx = await greeterContract.setGreeting(newGreeting);
-    // // console.log(`Greeting transaction: ${setGreetingTx.hash}`);
-    // // setTxHash(setGreetingTx);
+    const setGreetingTx = await greeterContract.setGreeting(newGreeting);
+    console.log(`Greeting transaction: ${setGreetingTx.hash}`);
+    setTxHash(setGreetingTx.hash);
 
     // Update current greeting
     const updatedGreeting = await greeterContract.greet();
@@ -65,12 +67,13 @@ const Greeter = () => {
       </p>
       <div className="pb-2 flex flex-col">
         <p className="text-xl pb-2">Current greeting: </p>{" "}
-        <p className="font-thin">{currentGreeting}</p>
+        <p className="font-thin text-3xl">{currentGreeting}</p>
       </div>
-      <label className="pb-2">
+      <label className="pb-1">
         Enter A New Greeting:
         <input
-          placeholder="Hello Goerli!"
+          placeholder="Hello Goerli!... (Max 100 characters)"
+          maxLength={100}
           type="text"
           value={newGreeting}
           onChange={handleNewGreetingChange}
@@ -80,10 +83,29 @@ const Greeter = () => {
       <MetaMaskAuth />
       <button
         onClick={handleSetGreeting}
-        className="text-gray-600 bg-gradient-to-r from-teal-200 to-lime-200 hover:bg-gradient-to-l hover:from-teal-200 hover:to-lime-200 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-teal-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+        className=" cursor-pointer text-gray-600 bg-gradient-to-r from-teal-200 to-lime-200 hover:bg-gradient-to-l hover:from-teal-200 hover:to-lime-200 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-teal-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
       >
         Set greeting
       </button>
+      <p className="text-sm font-normal">
+        Any vulgarity, profanity, or hate-speech will be filtered and replaced.
+      </p>
+      {txHash && (
+        <div className="text-sm">
+          <p>
+            TX Hash:{" "}
+            <a
+              href={`https://goerli.etherscan.io/tx/${txHash}`}
+              rel="noreffer"
+              className="font-thin"
+              target="_blank"
+            >
+              {" "}
+              {txHash}{" "}
+            </a>
+          </p>
+        </div>
+      )}
     </div>
   );
 };
