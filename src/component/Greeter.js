@@ -76,8 +76,8 @@ const Greeter = () => {
       </p>
 
       <div className="block p-6 rounded-lg shadow ">
-        <p className="text-xl pb-2 font-bold">Current Message: </p>{" "}
-        <p className="font-light lg:text-2xl md:text-xl sm:text-lg  rounded-lg p-4 bg-gray-800">
+        <p className="text-xl pb-2 font-bold ">Current Message: </p>{" "}
+        <p className="font-light lg:text-2xl md:text-xl sm:text-lg  rounded-lg p-4  bg-gray-800">
           {currentGreeting}
         </p>
       </div>
